@@ -1,0 +1,20 @@
+{
+  "name": "bsp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.2.4",
+    "webpack": "^5.33.2",
+    "webpack-cli": "^4.6.0"
+  },
+  "scripts": {
+    "tsc": "tsc -p src",
+    "tsc-w": "tsc -w -p src",
+    "webpack": "webpack --mode=development",
+    "webpack-w": "webpack --mode=development --watch"
+  },
+  "author": "",
+  "license": "ISC"
+}
