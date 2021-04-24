@@ -10,9 +10,8 @@
     "webpack-cli": "^4.6.0"
   },
   "scripts": {
-    "tsc": "tsc -p src",
+    "build": "tsc -p src && webpack --mode=development",
     "tsc-w": "tsc -w -p src",
-    "webpack": "webpack --mode=development",
     "webpack-w": "webpack --mode=development --watch"
   },
   "author": "",

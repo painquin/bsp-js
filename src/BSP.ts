@@ -1,17 +1,25 @@
-import { BSPNode, Rect } from "./BSPNode";
+import { BSPNode, Rect, SplitDirection } from "./BSPNode";
 
+type ExitDir = "top" | "bottom" | "left" | "right";
+type Corridor = {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+}
 export class BSP
 {
     public leaves : BSPNode[];
     public all : BSPNode[];
     public root : BSPNode;
-    public corridors : Rect[];
+    public corridors : Corridor[];
 
     generate()
     {
         let todo : BSPNode[] = [];
         this.leaves = [];
         this.all = [];
+        this.corridors = [];
 
         function makeNode(x : number, y: number, w: number, h: number, depth: number, idx : number) : BSPNode
         {
@@ -34,10 +42,10 @@ export class BSP
         {
             let node = randomTodo();
 
-            if (Math.min(node.rect.w, node.rect.h) < 250)
+            if (Math.min(node.rect.w, node.rect.h) < 250 || Math.random() < 0.1 * node.depth - 0.2  )
             {
-                let w : number = (Math.random() * 0.25 + 0.5) * node.rect.w;
-                let h : number = (Math.random() * 0.25 + 0.5) * node.rect.h;
+                let w : number = (Math.random() * 0.2 + 0.4) * node.rect.w;
+                let h : number = (Math.random() * 0.2 + 0.4) * node.rect.h;
                 let x : number = node.rect.x + Math.random() * (node.rect.w - w);
                 let y : number = node.rect.y + Math.random() * (node.rect.h - h);
 
@@ -61,6 +69,7 @@ export class BSP
             
             if (mode == "y")
             {
+                node.split = "vertical";
                 node.left = makeNode(
                     node.rect.x,
                     node.rect.y,
@@ -79,6 +88,7 @@ export class BSP
             }
             else
             {
+                node.split = "horizontal";
                 node.left = makeNode(
                     node.rect.x,
                     node.rect.y,
@@ -102,6 +112,58 @@ export class BSP
             this.all.push(node.right);
         }
         
-        //todo: generate corridors
+        this.link(this.root);
+        
+    }
+
+    link(root : BSPNode)
+    {
+        if (root.left == null) return;
+
+        this.link(root.left);
+        this.link(root.right);
+
+        if (root.split == "horizontal")
+        {
+            let top = this.findNode(root.left, "bottom");
+            let bottom = this.findNode(root.right, "top");
+            this.corridors.push({
+                x1: Math.floor(top.rect.x + 0.5 * top.rect.w),
+                y1: Math.floor(top.rect.y + top.rect.h),
+                x2: Math.floor(bottom.rect.x + 0.5 * bottom.rect.w),
+                y2: Math.floor(bottom.rect.y)
+            });
+        }
+        else
+        {
+            let left = this.findNode(root.left, "right");
+            let right = this.findNode(root.right, "left");
+            this.corridors.push({
+                x1: Math.floor(left.rect.x + left.rect.w),
+                y1: Math.floor(left.rect.y + 0.5 * left.rect.h),
+                x2: Math.floor(right.rect.x),
+                y2: Math.floor(right.rect.y + 0.5 * right.rect.h)
+            });
+        }
+    }
+
+    findNode(root : BSPNode, dir : ExitDir) : BSPNode
+    {
+        if (root.left == null) // this is a leaf node
+            return root;
+
+        if ((dir == "top" || dir == "bottom") && root.split != "horizontal")
+        {
+            if (Math.random() < 0.5) return this.findNode(root.left, dir);
+            return this.findNode(root.right, dir);
+        }
+        if ((dir == "left" || dir == "right") && root.split != "vertical")
+        {
+            if (Math.random() < 0.5) return this.findNode(root.left, dir);
+            return this.findNode(root.right, dir);
+        }
+
+        if (dir == "top" || dir == "left") return this.findNode(root.left, dir);
+        else return this.findNode(root.right, dir);
     }
 }
