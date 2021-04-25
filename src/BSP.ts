@@ -42,7 +42,7 @@ export class BSP
         {
             let node = randomTodo();
 
-            if (Math.min(node.rect.w, node.rect.h) < 250 || Math.random() < 0.1 * node.depth - 0.2  )
+            if (Math.min(node.rect.w, node.rect.h) < 150 || Math.random() < 0.1 * node.depth - 0.2  )
             {
                 let w : number = (Math.random() * 0.2 + 0.4) * node.rect.w;
                 let h : number = (Math.random() * 0.2 + 0.4) * node.rect.h;
@@ -152,18 +152,19 @@ export class BSP
         if (root.left == null) // this is a leaf node
             return root;
 
-        if ((dir == "top" || dir == "bottom") && root.split != "horizontal")
-        {
-            if (Math.random() < 0.5) return this.findNode(root.left, dir);
-            return this.findNode(root.right, dir);
-        }
-        if ((dir == "left" || dir == "right") && root.split != "vertical")
-        {
-            if (Math.random() < 0.5) return this.findNode(root.left, dir);
-            return this.findNode(root.right, dir);
-        }
+        let left = this.findNode(root.left, dir);
+        let right = this.findNode(root.right, dir);
 
-        if (dir == "top" || dir == "left") return this.findNode(root.left, dir);
-        else return this.findNode(root.right, dir);
+        switch(dir)
+        {
+            case "top":
+                return left.rect.y < right.rect.y ? left : right;
+            case "bottom":
+                return left.rect.y + left.rect.h > right.rect.y + right.rect.h ? left : right;
+            case "left":
+                return left.rect.x < right.rect.x ? left : right;
+            case "right":
+                return left.rect.x + left.rect.w > right.rect.x + right.rect.w ? left : right;
+        }
     }
 }
