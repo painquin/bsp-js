@@ -42,7 +42,7 @@ export class BSP
         {
             let node = randomTodo();
 
-            if (Math.min(node.rect.w, node.rect.h) < 150 || Math.random() < 0.1 * node.depth - 0.2  )
+            if (Math.max(node.rect.w, node.rect.h) < 150 || Math.random() < 0.1 * node.depth - 0.2  )
             {
                 let w : number = (Math.random() * 0.2 + 0.4) * node.rect.w;
                 let h : number = (Math.random() * 0.2 + 0.4) * node.rect.h;
