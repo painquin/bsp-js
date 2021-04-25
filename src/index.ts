@@ -7,7 +7,7 @@ function init()
     let cv = document.getElementById("cv") as HTMLCanvasElement;
     let ctx = cv.getContext('2d');
     let bsp = new BSP();
-    bsp.generate();
+    bsp.generate({x: 0, y: 0, w: 800, h: 600});
 
     ctx.strokeStyle = "#FFF";
     ctx.fillStyle = "#FFF";
@@ -46,8 +46,22 @@ function init()
     {
         let corr = bsp.corridors[i];
         ctx.beginPath();
-        ctx.moveTo(corr.x1, corr.y1);
-        ctx.lineTo(corr.x2, corr.y2);
+        ctx.moveTo(corr.x1+0.5, corr.y1+0.5);
+
+        if (corr.dir == "horizontal")
+        {
+            let mx = Math.floor((corr.x1 + corr.x2) / 2) + 0.5;
+            ctx.lineTo(mx, corr.y1);
+            ctx.lineTo(mx, corr.y2);
+        }
+        else
+        {
+            let my = Math.floor((corr.y1 + corr.y2) / 2) + 0.5;
+            ctx.lineTo(corr.x1, my);
+            ctx.lineTo(corr.x2, my);
+        }
+
+        ctx.lineTo(corr.x2+0.5, corr.y2+0.5);
         ctx.stroke();
     }
 

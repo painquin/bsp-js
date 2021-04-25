@@ -6,6 +6,7 @@ type Corridor = {
     y1: number
     x2: number
     y2: number
+    dir: SplitDirection
 }
 export class BSP
 {
@@ -14,7 +15,7 @@ export class BSP
     public root : BSPNode;
     public corridors : Corridor[];
 
-    generate()
+    generate(bounds : Rect)
     {
         let todo : BSPNode[] = [];
         this.leaves = [];
@@ -34,7 +35,7 @@ export class BSP
             return node;
         }
         let idx : number = 0;
-        this.root = makeNode(5, 5, 1190, 790, 0, 0);
+        this.root = makeNode(bounds.x + 5, bounds.y + 5, bounds.w - 10, bounds.h - 10, 0, 0);
         todo.push(this.root);
         this.all.push(this.root);
         
@@ -42,7 +43,7 @@ export class BSP
         {
             let node = randomTodo();
 
-            if (Math.max(node.rect.w, node.rect.h) < 150 || Math.random() < 0.1 * node.depth - 0.2  )
+            if (Math.max(node.rect.w, node.rect.h) < 50 || Math.random() < 0.1 * node.depth - 0.2  )
             {
                 let w : number = (Math.random() * 0.2 + 0.4) * node.rect.w;
                 let h : number = (Math.random() * 0.2 + 0.4) * node.rect.h;
@@ -123,15 +124,18 @@ export class BSP
         this.link(root.left);
         this.link(root.right);
 
+        let r = () => Math.random() * 0.2 + 0.4;
+
         if (root.split == "horizontal")
         {
             let top = this.findNode(root.left, "bottom");
             let bottom = this.findNode(root.right, "top");
             this.corridors.push({
-                x1: Math.floor(top.rect.x + 0.5 * top.rect.w),
+                x1: Math.floor(top.rect.x + r() * top.rect.w),
                 y1: Math.floor(top.rect.y + top.rect.h),
-                x2: Math.floor(bottom.rect.x + 0.5 * bottom.rect.w),
-                y2: Math.floor(bottom.rect.y)
+                x2: Math.floor(bottom.rect.x + r() * bottom.rect.w),
+                y2: Math.floor(bottom.rect.y),
+                dir: "vertical"
             });
         }
         else
@@ -140,9 +144,10 @@ export class BSP
             let right = this.findNode(root.right, "left");
             this.corridors.push({
                 x1: Math.floor(left.rect.x + left.rect.w),
-                y1: Math.floor(left.rect.y + 0.5 * left.rect.h),
+                y1: Math.floor(left.rect.y + r() * left.rect.h),
                 x2: Math.floor(right.rect.x),
-                y2: Math.floor(right.rect.y + 0.5 * right.rect.h)
+                y2: Math.floor(right.rect.y + r() * right.rect.h),
+                dir: "horizontal"
             });
         }
     }
